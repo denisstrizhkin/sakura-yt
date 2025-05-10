@@ -32,13 +32,22 @@ class VideoInfo(BaseModel):
     formats: list[VideoFormat | AudioFormat]
 
 
-class YT:
+class YtError(Exception): ...
+
+
+class Yt:
     def __init__(self):
-        ydl_opts = {}
+        ydl_opts = {"noplaylist": True}
         self._ydl = yt_dlp.YoutubeDL(ydl_opts)
 
     def _get_video_info_raw(self, uri: str) -> VideoInfoRaw:
-        info = self._ydl.extract_info(uri, download=False)
+        info = self._ydl.extract_info(uri, download=False, process=False)
+        print(info)
+        if "_type" in info and info["_type"] == "url":
+            info = self._ydl.extract_info(info["url"], download=False, process=False)
+        if "formats" not in info:
+            raise YtError("Only singgle videos allowed")
+        print(info)
         return VideoInfoRaw.model_validate(self._ydl.sanitize_info(info))
 
     def get_video_info(self, uri: str) -> VideoInfo:

@@ -8,7 +8,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
-from .yt import YT, VideoFormat, AudioFormat
+from .yt import Yt, VideoFormat, AudioFormat, YtError
 
 
 # Bot token can be obtained via https://t.me/BotFather
@@ -17,14 +17,24 @@ TOKEN = getenv("BOT_TOKEN")
 # All handlers should be attached to the Router (or Dispatcher)
 
 dp = Dispatcher()
-yt = YT()
+yt = Yt()
 
 
 @dp.message()
 async def echo_handler(message: Message) -> None:
-    info = yt.get_video_info(message.text)
-    logging.info(info)
+    info = None
+    msg = None
     try:
+        info = yt.get_video_info(message.text)
+    except YtError as e:
+        msg = str(e)
+
+    try:
+        if msg:
+            await message.answer(msg)
+            return
+
+        logging.info(info)
         # Send a copy of the received message
         buttons: list[[InlineKeyboardButton]] = list()
         for format in info.formats:
