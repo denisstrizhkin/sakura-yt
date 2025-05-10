@@ -1,0 +1,19 @@
+[project]
+name = "sakura-yt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiogram>=3.20.0.post0",
+    "pydantic>=2.11.4",
+    "yt-dlp>=2025.4.30",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "mypy>=1.15.0",
+    "python-lsp-server[all]>=1.12.2",
+    "ruff>=0.11.9",
+]
